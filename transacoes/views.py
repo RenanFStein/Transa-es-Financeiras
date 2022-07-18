@@ -5,7 +5,6 @@ from django.shortcuts import redirect, render, HttpResponse
 from django.contrib.auth.models import User
 from csv import reader
 from django.http import FileResponse
-from numpy import append, roots
 from .models import  Controller, ImportacoesArquivos
 from django.views.generic import DetailView, ListView
 from django.db import IntegrityError
@@ -15,7 +14,6 @@ from django.db.models import Sum, Min, Max, Count
 from django.contrib import auth, messages
 from xml.dom import minidom
 import xml.etree.ElementTree as ET
-import pandas as pd
 from collections import defaultdict
 import json
 

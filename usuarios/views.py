@@ -7,7 +7,7 @@ from email.message import EmailMessage
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import auth, messages
 from django.contrib.auth import authenticate, login
-from decouple import config
+from decouple import *
 # Create your views here.
 
 def index(request):
