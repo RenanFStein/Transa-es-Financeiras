@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<h1 class="h1" style="text-align: center"> Usuarios Cadastrados </h1>
+
+<button type="button" class="button is-primary is-rounded d-flex gap-1"  data-toggle="modal" data-target="#exampleModalCenter" data-backdrop="static" data-keyboard="false">
+  <i class="fa-solid fa-plus"></i>
+  <span>Novo Usuário</span>
+</button>
+
+<!-- Modal Novo Usuário-->
+
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header" >
+        <form action="{% url 'new_user' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group" >
+            <label class="label" for="exampleInputEmail1"> Email: </label>
+
+          <div class="control has-icons-left has-icons-right">
+            <input required type="email" class="input" name = 'email' class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Email">
+            <span class="icon is-small is-left">
+              <i class="fas fa-envelope"></i>
+            </span>
+          </div>
+          
+        </div>
+        <div class="label" class="form-group">
+          <label for="exampleInputPassword1">Nome</label>
+          <div class="control has-icons-left has-icons-right">
+            <input required type="text" name = 'name' class="input"  placeholder="Nome">  
+            <span class="icon is-small is-left">
+              <i class="fas fa-user"></i>
+            </span>
+          </div>                   
+        </div>
+      </div>
+      <div class="modal-footer">
+          <a  href="{% url 'usuarios' %}" type="button"  class="button is-dark is-rounded">Sair</a>
+          <button type="submit" class="button is-primary is-rounded">Cadastrar</button>
+      </form>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+<div class="table-responsive">
+  <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+
+    <thead >
+      <tr>
+        <th class="h4 col-1">ID</th>
+        <th class="h4 col-3">Usuario</th>
+        <th class="h4 col-4">Email</th>
+        <th class="h4 col-2">Editar Usuário</th>
+        <th class="h4 col-2">Excluir Usuário</th>
+      </tr>
+    </thead>
+  
+    {% include 'account\messages.html' %}
+  
+  
+    <tbody>
+      {% for usuarios in lista_usuarios %}
+      {% if usuarios.is_active == True %}
+      <tr>      
+        <td class="h5">{{ usuarios.id }}</td>   
+        <td class="h5">{{ usuarios.first_name }}</td>  
+        <td class="h5">{{ usuarios.email }}</td>
+        
+        <td>
+          <!-- Modal Editar Usuário-->
+  
+          <button type="button" class="button is-warning is-rounded gap-1" data-toggle="modal" data-target="#modal-editar{{usuarios.id}}" data-backdrop="static" data-keyboard="false">
+            <i class="fa-solid fa-pen"></i>
+            <span>Editar Usuário</span>
+          </button>
+  
+          <div class="modal fade" id="modal-editar{{usuarios.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <form action="{% url 'update_user' %}" method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="form-group">
+                    <label class="label" for="exampleInputEmail1">Email </label>
+                    <div class="control has-icons-left has-icons-right">
+                      <input required type="email" name = 'email' class="input" value="{{usuarios.email}}">
+                      <span class="icon is-small is-left">
+                      <i class="fas fa-envelope"></i>
+                      </span>  
+                    </div>
+                  </div>
+                  <div class="label" class="form-group">
+                    <label for="exampleInputPassword1">Nome</label>
+                      <div class="control has-icons-left has-icons-right">
+                        <input required type="text" name = 'first_name' class="input"  value="{{usuarios.first_name}}">  
+                        <span class="icon is-small is-left">
+                          <i class="fas fa-user"></i>
+                        </span>
+                      </div>                   
+                  </div>
+                  <br>
+                  <input type="number" name = '{{usuarios.id}}' class="form-control" hidden>
+                </div>
+                <div class="modal-footer">
+                  <a href="{% url 'usuarios' %}" type="button" class="button is-dark is-rounded">Sair</a>
+                  <button type="submit" class="button is-primary is-rounded">Atualizar</button>
+                </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+        <td>
+       <!-- Modal Excluir Usuário-->
+  
+          <button type="button" class="button is-danger is-rounded gap-1" data-toggle="modal" data-target="#modal-excluir{{usuarios.id}}" data-backdrop="static" data-keyboard="false">
+            <i class="fa-solid fa-trash-can"></i>
+            Excluir Usuário
+          </button>
+     
+          <div class="modal fade" id="modal-excluir{{usuarios.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" >
+            <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLongTitle"><b>Aviso !</b></h5>
+                </div>
+                <div class="modal-body">
+                  <p><b>Deseja realmente excluir:</b> </p>
+                  <p><b>Usuário: </b>{{ usuarios.first_name }}</p>
+                  <p><b>Email: </b>{{ usuarios.email}}</p>
+                </div>
+                <div class="modal-footer">
+                  <form action="{% url 'delete_user' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="number" name = '{{usuarios.id}}' class="form-control" hidden>
+                    <button type="button" class="button is-dark is-rounded" data-dismiss="modal">Sair</button>
+                    <button type="submit" class="button is-primary is-rounded">Confirmar Exclusão</button>
+                </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>    
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+
+
+{% endblock %}

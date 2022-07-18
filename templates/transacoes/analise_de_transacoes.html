@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="container" style="text-align: center;">
+    <h1 class="h1"> Análise de Transações Suspeitas </h1>
+
+    <form action="{% url 'analise_de_transacoes' %}" method="post">
+      {% csrf_token %}
+      <label>Selecione o data para analisar as transações: </label><br>
+      
+      <input type="date" name="data_inicial" class="button is-rounded" required>
+
+      <input type="date" name="data_final"  class="button is-rounded"required>
+      <br>
+      <br>
+      <button type="submit" class="button is-primary is-rounded">Realizar Análises</button>
+  </form>
+<br>
+{% if request.method == "POST" %}
+<div>
+{% include 'account\messages.html' %}
+{% if transacoes_suspeitas.0.6 %}
+
+  <h1 class="h1"> Transações Suspeitas </h1>
+<table class="table">
+    <thead>
+      <tr>
+        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+          <thead class="table-success">      
+            <tr >
+              <th colspan="3" style="text-align: center;" >Origem</th>
+                    
+              <th colspan="3" style="text-align: center;" > Destino</th>
+
+              <th rowspan="2" style="text-align: center;" >Valor da Transação</th>
+
+              <th rowspan="2" style="text-align: center;" >Hora da Transação</th>
+            </tr>
+            <tr>
+              <th style="text-align: center;" >Banco</th>
+              <th style="text-align: center;" >Agencia </th>
+              <th style="text-align: center;" >Conta </th>
+              <th style="text-align: center;" >Banco </th>
+              <th style="text-align: center;" >Agencia </th>
+              <th style="text-align: center;" >Conta </th>            
+            </tr>
+          </thead>  
+      </tr>
+    </thead>
+    <tbody>
+     
+      {% for transacao_suspeita in transacoes_suspeitas %}
+          
+      <tr>
+        <td>{{ transacao_suspeita.0 }}</td>
+        <td>{{ transacao_suspeita.1 }}</td>
+        <td>{{ transacao_suspeita.2 }}</td>
+        <td>{{ transacao_suspeita.3 }}</td>
+        <td>{{ transacao_suspeita.4 }}</td>
+        <td>{{ transacao_suspeita.5 }}</td>
+        <td style="text-align: center;">R$ {{ transacao_suspeita.6|floatformat:2 }}</td>
+        <td style="text-align: center;">Dia {{ transacao_suspeita.8 }} às {{ transacao_suspeita.7 }} </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if contas_suspeitas.0 %}
+
+<h1 class="h1"> Contas Suspeitas </h1>
+<table class="table">
+  <thead>
+    <tr>
+      <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+        <thead>      
+          <tr class="table-success">
+            <th style="text-align: center;">Banco</th>
+            <th style="text-align: center;">Agencia </th>
+            <th style="text-align: center;">Conta </th>
+            <th style="text-align: center;">Valor Movimentado </th>
+            <th style="text-align: center;">Tipo Movimentação </th>      
+          </tr>
+        </thead>  
+    </tr>
+  </thead>
+  <tbody>
+      {% for conta_suspeita in contas_suspeitas %}
+          {% if conta_suspeita.3 > 30000 %}
+          <tr>    
+            <td>{{ conta_suspeita.0 }}</td>
+            <td>{{ conta_suspeita.1 }}</td>
+            <td>{{ conta_suspeita.2 }}</td> 
+            <td style="text-align: center;"> R$ {{ conta_suspeita.3 |floatformat:2}} </td>
+            {% if conta_suspeita.0 != 'BANCO BRADESCO' %}
+            <td class="table-primary"> Entrada </td>
+            {% else %}
+            <td class="table-danger" > Saida </td>
+            {% endif %}    
+        </tr>   
+      {% endif %}
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if agencias_suspeitas.0%}
+
+<h1 class="h1"> Agências Suspeitas </h1>
+<table class="table">
+  <thead>
+    <tr>
+      <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+        <thead>      
+          <tr class="table-success">
+            <th style="text-align: center;">Banco</th>
+            <th style="text-align: center;">Agência </th>
+            <th style="text-align: center;">Valor Movimentado </th>
+            <th style="text-align: center;">Tipo de Movimentação </th>            
+          </tr>
+        </thead>  
+    </tr>
+  </thead>
+  <tbody>
+      {% for agencia_suspeita in agencias_suspeitas %}
+      {% if agencia_suspeita.2 > 100000 %}
+      <tr>    
+      <td>{{ agencia_suspeita.0 }}</td>
+      <td>{{ agencia_suspeita.1 }}</td>
+      <td style="text-align: center;"> R$ {{ agencia_suspeita.2 |floatformat:2}} </td>
+      {% if agencia_suspeita.0 != 'BANCO BRADESCO' %}
+      <td class="table-primary"> Entrada </td>
+      {% else %}
+      <td class="table-danger" > Saida </td>
+      {% endif %}
+    </tr>   
+    {% endif %}
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+</div>
+{% else %}
+
+
+{% endif %}
+{% endif %}
+
+
+{% endblock %}
+  

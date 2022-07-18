@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+{% include 'account\messages.html' %}
+<body class="text-center">
+  <div class="container-sm col-sm-4">
+<h1 class="h3"> Entrar </h1>
+<form action="{% url 'login' %}" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="form-group">
+    <label class="label" for="exampleInputEmail1">Email:</label>
+    <div class="control has-icons-left has-icons-right">
+    <input required type="email"  name='email' class="input form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Ex: Stein@bank.com">
+    <span class="icon is-small is-left">
+      <i class="fas fa-envelope"></i>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="label" for="exampleInputPassword1">Senha:</label>
+    <div class="control has-icons-left has-icons-right">
+    <input required type="password" name='password' class="input form-control" id="exampleInputPassword1" placeholder="Password">
+    <span class="icon is-small is-left">
+      <i class="fas fa-lock"></i>
+    </span>
+  </div>
+  </div>
+  <button type="submit" class="button is-primary is-rounded gap-1">Logar</button>
+  <a href="{% url 'cadastro' %}" class="button is-info is-rounded gap-1">Ainda não tem Conta?</a>
+</form>
+</div>
+</body>
+{% endblock %}

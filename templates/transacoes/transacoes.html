@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<style>
+  .modal-lg {
+    min-width: 75%
+  }
+</style>
+
+<div class="container" style="text-align: center;">
+<h1 class="h1 d-flex justify-content-center"> Importar Transações </h1>
+{% include 'account\messages.html' %}
+<div class="d-flex justify-content-center">
+  <form action="{% url 'transacoes' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="file is-info is-light ">
+      <label class="file-label ">
+        <input required class="file-input" type="file" name="file_name" accept=".csv, .xml" onchange="checkfile(this);">
+        <span class="file-cta ">
+          <span class="file-icon ">
+            <i class="fas fa-upload"></i>
+          </span>
+          <span class="file-label ">
+            Arquivo a ser Importado
+          </span>
+        </span>
+      </label>
+    </div>
+    <button type="submit" class="button is-primary is-rounded">Importar</button>
+</div>
+</form>
+</div>
+</div>
+
+
+<h1 class="h2" style="text-align: center"> Importações Realizadas </h1>
+<br>
+<div class="container">
+
+  <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+     
+    <thead>
+      
+      <thead>
+        <tr>
+          <th>Data Transação</th>
+          <th>Data Importação</th>
+          <th>Detalhar Importação</th>
+        </tr>
+      </thead>
+      {% for lista_informacao in lista_informacao_arquivo %}
+
+      <tr>
+        
+        <tr>
+          <td>{{ lista_informacao.data_transacao_arquivo }}</td>
+          <td>{{ lista_informacao.data_importacao_arquivo }}</td>
+          
+          
+          <td>
+            <button type="button" class="button is-info is-light is-rounded" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#modal{{lista_informacao.id}}">
+              {{ lista_informacao.nome_arquivo }}
+            </button> 
+          </td>  
+          </tr>
+          
+    </thead>
+ 
+    {% endfor %}
+    
+  </table>
+  
+  <!-- The Modal -->
+  {% for lista_informacao in lista_informacao_arquivo %}
+ 
+
+  <div class="modal" id="modal{{lista_informacao.id}}">
+    <div class="modal-dialog" style="min-width: 75%">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h1 class="modal-title h3" >Detalhes das Transações</h1>
+          <button type="button" class="btn btn-secondary " data-dismiss="modal">Close</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body ">
+          <tr>
+            <th style="text-align: center;"><b>Importado em:</b> {{lista_informacao.data_importacao_arquivo}}</th>
+            <br>
+            {% if lista_informacao.usuario_importacao_arquivo.is_active == True %}
+            <th style="text-align: center;"><b>Importado por:</b> {{lista_informacao.usuario_importacao_arquivo.first_name}}</th>
+            <br>
+            {% else %}
+            <th style="text-align: center;" ><b> Importado por: </b> <b style="color: red;">{{lista_informacao.usuario_importacao_arquivo.first_name}}</b></th>
+            <br>
+            {% endif %}
+            <th style="text-align: center;"><b>Data Transações:</b> {{lista_informacao.data_transacao_arquivo}} </th>
+          </tr>      
+          <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+          </table>
+          <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+            <thead>      
+              <tr>
+                <th colspan="3" style="text-align: center;"class="table-primary">Origem</th>
+                      
+                <th colspan="3" style="text-align: center;" class="table-success"> Destino</th>
+
+                <th rowspan="2" style="text-align: center;" class="table-info">Valor da Transação</th>
+
+                <th rowspan="2" style="text-align: center;" class="table-info">Hora da Transação</th>
+              </tr>
+              <tr>
+                <th style="text-align: center;" class="table-primary">Banco</th>
+                <th style="text-align: center;" class="table-primary">Agencia </th>
+                <th style="text-align: center;" class="table-primary">Conta </th>
+                <th style="text-align: center;" class="table-success">Banco </th>
+                <th style="text-align: center;" class="table-success">Agencia </th>
+                <th style="text-align: center;" class="table-success">Conta </th>            
+              </tr>
+            </thead>      
+            {% for lista_conteudo in lista_conteudo_arquivo %} 
+            {% if lista_conteudo.data_da_transacao == lista_informacao.data_transacao_arquivo %}
+            <tbody>
+              {{ lista_conteudo.nome_arquivo }}{{ lista_arquivo.id_arquivo }}
+              <tr>  
+                <td>{{ lista_conteudo.banco_origem }}</td>
+                <td>{{ lista_conteudo.agencia_origem }}</td>
+                <td>{{ lista_conteudo.conta_origem }}</td>
+                <td>{{ lista_conteudo.banco_destino }}</td>
+                <td>{{ lista_conteudo.agencia_destino }}</td>
+                <td>{{ lista_conteudo.conta_destino }}</td>
+                <td style="text-align: center;">R$ {{ lista_conteudo.valor_da_transacao |floatformat:2 }}</td>
+                <td style="text-align: center;">{{ lista_conteudo.hora_da_transacao }} Dia {{lista_conteudo.data_da_transacao}}</td>
+                
+              </tr>
+            </tbody>          
+            {% endif %}          
+            {% endfor %}   
+          </table>    
+        </div>   
+      </div>
+    </div>  
+  </div> 
+  {% endfor %}
+</div>
+
+
+</div>
+
+
+
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Functions to open and close a modal
+    function openModal($el) {
+      $el.classList.add('is-active');
+    }
+
+    function closeModal($el) {
+      $el.classList.remove('is-active');
+    }
+
+    function closeAllModals() {
+      (document.querySelectorAll('.modal') || []).forEach(($modal) => {
+        closeModal($modal);
+      });
+    }
+
+    // Add a click event on buttons to open a specific modal
+    (document.querySelectorAll('.js-modal-trigger') || []).forEach(($trigger) => {
+      const modal = $trigger.dataset.target;
+      const $target = document.getElementById(modal);
+      console.log($target);
+
+      $trigger.addEventListener('click', () => {
+        openModal($target);
+      });
+    });
+
+    // Add a click event on various child elements to close the parent modal
+    (document.querySelectorAll(
+      '.modal-background, .modal-close, .modal-card-head .delete, .modal-card-foot .button') || []).forEach((
+        $close) => {
+        const $target = $close.closest('.modal');
+
+        $close.addEventListener('click', () => {
+          closeModal($target);
+        });
+      });
+
+    // Add a keyboard event to close all modals
+    document.addEventListener('keydown', (event) => {
+      const e = event || window.event;
+
+      if (e.keyCode === 27) { // Escape key
+        closeAllModals();
+      }
+    });
+  });
+</script>
+{% endblock %}
